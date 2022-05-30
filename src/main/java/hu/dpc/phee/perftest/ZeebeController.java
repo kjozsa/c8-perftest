@@ -23,6 +23,5 @@ public class ZeebeController {
                 .variables(Map.of("start", System.currentTimeMillis()))
                 .send()
                 .join();
-        logger.info("flow started");
     }
 }

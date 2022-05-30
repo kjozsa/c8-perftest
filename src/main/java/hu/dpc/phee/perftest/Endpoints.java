@@ -22,6 +22,7 @@ public class Endpoints {
         app.get("/", ctx -> ctx.result("boo"));
 
         app.get("/start", ctx -> {
+            logger.info("starting 1 instance");
             zeebeController.startWorkflowInstance();
             ctx.result("ok");
         });
