@@ -23,7 +23,7 @@ public class Endpoints {
 
         app.get("/start", ctx -> {
             logger.info("starting 1 instance");
-            zeebeController.startWorkflowInstance();
+            zeebeController.startWorkflowInstance(0);
             ctx.result("ok");
         });
 
@@ -31,7 +31,7 @@ public class Endpoints {
             int num = Integer.parseInt(ctx.pathParam("num"));
             logger.info("starting {} instances", num);
             for (int i = 0; i < num; i++) {
-                zeebeController.startWorkflowInstance();
+                zeebeController.startWorkflowInstance(i);
             }
             ctx.result("ok");
         });
