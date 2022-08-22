@@ -17,7 +17,7 @@ public class Workers {
     public void step1Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
-        logger.info("Process instance [" + processInstanceKey + "] -> step1 invoked:  " + workerStart);
+        logger.debug("Process instance [" + processInstanceKey + "] -> step1 invoked:  " + workerStart);
         try {
             Thread.sleep(workerSleepTime);
         }catch (Exception e) {
@@ -25,14 +25,14 @@ public class Workers {
         }
         client.newCompleteCommand(job.getKey()).send();
         long workerFinish = System.currentTimeMillis();
-        logger.info("Process instance [" + processInstanceKey + "] -> step1 complete: " + System.currentTimeMillis() + " in: " + (workerFinish-workerStart) + "ms");
+        logger.debug("Process instance [" + processInstanceKey + "] -> step1 complete: " + System.currentTimeMillis() + " in: " + (workerFinish-workerStart) + "ms");
     }
 
     @ZeebeWorker(type = "step2")
     public void step2Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
-        logger.info("Process instance [" + processInstanceKey + "] -> step2 invoked:  " + workerStart);
+        logger.debug("Process instance [" + processInstanceKey + "] -> step2 invoked:  " + workerStart);
         try {
             Thread.sleep(workerSleepTime);
         }catch (Exception e) {
@@ -40,14 +40,14 @@ public class Workers {
         }
         client.newCompleteCommand(job.getKey()).send();
         long workerFinish = System.currentTimeMillis();
-        logger.info("Process instance [" + processInstanceKey + "] -> step2 complete: " + System.currentTimeMillis() + " in: " + (workerFinish-workerStart) + "ms");
+        logger.debug("Process instance [" + processInstanceKey + "] -> step2 complete: " + System.currentTimeMillis() + " in: " + (workerFinish-workerStart) + "ms");
     }
 
     @ZeebeWorker(type = "step3")
     public void step3Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
-        logger.info("Process instance [" + processInstanceKey + "] -> step3 invoked:  " + workerStart);
+        logger.debug("Process instance [" + processInstanceKey + "] -> step3 invoked:  " + workerStart);
         try {
             Thread.sleep(workerSleepTime);
         }catch (Exception e) {
@@ -55,14 +55,14 @@ public class Workers {
         }
         client.newCompleteCommand(job.getKey()).send();
         long workerFinish = System.currentTimeMillis();
-        logger.info("Process instance [" + processInstanceKey + "] -> step3 complete: " + System.currentTimeMillis() + " in: " + (workerFinish-workerStart) + "ms");
+        logger.debug("Process instance [" + processInstanceKey + "] -> step3 complete: " + System.currentTimeMillis() + " in: " + (workerFinish-workerStart) + "ms");
     }
 
     @ZeebeWorker(type = "step4")
     public void step4Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
-        logger.info("Process instance [" + processInstanceKey + "] -> step4 invoked:  " + workerStart);
+        logger.debug("Process instance [" + processInstanceKey + "] -> step4 invoked:  " + workerStart);
         try {
             Thread.sleep(workerSleepTime);
         }catch (Exception e) {
@@ -70,14 +70,14 @@ public class Workers {
         }
         client.newCompleteCommand(job.getKey()).send();
         long workerFinish = System.currentTimeMillis();
-        logger.info("Process instance [" + processInstanceKey + "] -> step4 complete: " + System.currentTimeMillis() + " in: " + (workerFinish-workerStart) + "ms");
+        logger.debug("Process instance [" + processInstanceKey + "] -> step4 complete: " + System.currentTimeMillis() + " in: " + (workerFinish-workerStart) + "ms");
     }
 
     @ZeebeWorker(type = "step5", fetchVariables = "start")
     public void step5Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
-        logger.info("Process instance [" + processInstanceKey + "] -> step5 invoked:  " + workerStart);
+        logger.debug("Process instance [" + processInstanceKey + "] -> step5 invoked:  " + workerStart);
         try {
             Thread.sleep(workerSleepTime);
         }catch (Exception e) {
@@ -87,8 +87,8 @@ public class Workers {
         Long start = (Long) job.getVariablesAsMap().get("start");
         client.newCompleteCommand(job.getKey()).send();
         long finish = System.currentTimeMillis();
-        logger.info("Process instance [" + processInstanceKey + "] -> step5 complete: " + System.currentTimeMillis() + " in: " + (finish-workerStart) + "ms");
-        logger.info("Process instance [" + processInstanceKey + "] -> finished flow in {} ms", (finish-start));
+        logger.debug("Process instance [" + processInstanceKey + "] -> step5 complete: " + System.currentTimeMillis() + " in: " + (finish-workerStart) + "ms");
+        logger.info("Process instance [" + processInstanceKey + "] -> finished flow in {}ms", (finish-start));
     }
 
 }
