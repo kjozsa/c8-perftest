@@ -19,8 +19,9 @@ public class ZeebeController {
     private ZeebeClient zeebeClient;
 
 
-    public void startWorkflowInstance(int num) {
+    public int startWorkflowInstance(int num) {
         int attempt = 1;
+        int fail=0;
         long wait_ms = 0;
         while (attempt > 0) {
             logger.info("Attempting to start process [num: {}][attempt: {}]", num, attempt);
@@ -38,6 +39,7 @@ public class ZeebeController {
                 //exponential wait until retry
                 wait_ms = (long) (100 * Math.pow(2, attempt - 1));
                 logger.warn("Process instance [num: {}][attempt: {}] start FAILED -> retrying in [{}]ms", num, attempt, wait_ms);
+                fail=1;
                 try {
                     Thread.sleep(wait_ms);
                 } catch (InterruptedException ex) {
@@ -46,5 +48,6 @@ public class ZeebeController {
                 attempt++;
             }
         }
+        return fail;
     }
 }
