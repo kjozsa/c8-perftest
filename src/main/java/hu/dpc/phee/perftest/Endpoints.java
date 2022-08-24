@@ -7,9 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Service
 public class Endpoints {
@@ -17,6 +14,13 @@ public class Endpoints {
 
     @Autowired
     ZeebeController zeebeController;
+
+    @Autowired
+    Workers workers;
+
+    @Autowired
+    Statistics statistics;
+
     private int failedCount;
 
     @PostConstruct
@@ -26,19 +30,26 @@ public class Endpoints {
 
         app.get("/start", ctx -> {
             failedCount=0;
-            logger.info("starting 1 instance");
+            logger.info("Initialising 1 instance");
+            statistics.beginTest(1, System.currentTimeMillis());
+
             failedCount+=zeebeController.startWorkflowInstance(0);
+
+            statistics.updateInitFailCount(failedCount);
             ctx.result("Number of fails : " +String.valueOf(failedCount));
         });
 
         app.get("/start/{num}", ctx -> {
             int num = Integer.parseInt(ctx.pathParam("num"));
-            logger.info("starting {} instances", num);
             failedCount=0;
+            logger.info("Initialising {} instances", num);
+            statistics.beginTest(num, System.currentTimeMillis());
+
             for (int i = 0; i < num; i++) {
                 failedCount+=zeebeController.startWorkflowInstance(i);
             }
-            logger.info("Number of fails: {}", failedCount);
+
+            statistics.updateInitFailCount(failedCount);
             ctx.result("Number of fails : " +String.valueOf(failedCount));
         });
     }
