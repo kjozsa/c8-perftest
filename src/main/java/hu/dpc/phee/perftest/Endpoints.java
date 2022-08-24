@@ -52,5 +52,26 @@ public class Endpoints {
             statistics.updateInitFailCount(failedCount);
             ctx.result("Number of fails : " +String.valueOf(failedCount));
         });
+
+        app.get("/start/slow/{num}", ctx -> {
+            int num = Integer.parseInt(ctx.pathParam("num"));
+            failedCount=0;
+            logger.info("Initialising {} instances", num);
+            statistics.beginTest(num, System.currentTimeMillis());
+
+            for (int i = 0; i < num; i++) {
+                failedCount+=zeebeController.startWorkflowInstance(i);
+
+                //wait one second between instance inits
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            statistics.updateInitFailCount(failedCount);
+            ctx.result("Number of fails : " +String.valueOf(failedCount));
+        });
     }
 }
