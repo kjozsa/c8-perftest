@@ -76,10 +76,10 @@ public class Statistics {
         long min = statistics[0].getMin();
         long max =  statistics[0].getMax();
 
-        logger.info("Process instances started with {} failed initializationsl", initFailCount);
-        logger.info("Test completed in {}ms -> " + statistics[0].toString(), convertTime(endTime - startTime));
-        logger.info("Average waiting time: {}ms ->" + statistics[1].toString(),statistics[1].getAverage());
-        logger.info("Average execution time: {}ms ->" + statistics[2].toString(),statistics[2].getAverage());
+        logger.info("Process instances started with {} failed initializations", initFailCount);
+        logger.info("Test completed in {}ms \t-> " + statistics[0].toString(), convertTime(endTime - startTime));
+        logger.info("Average waiting time: {}ms \t-> " + statistics[1].toString(),statistics[1].getAverage());
+        logger.info("Average execution time: {}ms \t-> " + statistics[2].toString(),statistics[2].getAverage());
     }
 
     private LongSummaryStatistics[] calculateStatistics() {

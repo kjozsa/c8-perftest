@@ -24,7 +24,7 @@ public class ZeebeController {
         int fail=0;
         long wait_ms = 0;
         while (attempt > 0) {
-            logger.info("Attempting to start process [num: {}][attempt: {}]", num, attempt);
+            logger.debug("Attempting to start process [num: {}][attempt: {}]", num, attempt);
             try {
                 long processInstanceKey = zeebeClient.newCreateInstanceCommand()
                         .bpmnProcessId("step15")
@@ -33,7 +33,7 @@ public class ZeebeController {
                         .send()
                         .join()
                         .getProcessInstanceKey();
-                logger.info("Started process instance [" + processInstanceKey + "][num: {}]:  " + System.currentTimeMillis(), num);
+                logger.debug("Started process instance [" + processInstanceKey + "][num: {}]:  " + System.currentTimeMillis(), num);
                 attempt = 0;
             } catch (ClientStatusException clientStatusException) {
                 //exponential wait until retry

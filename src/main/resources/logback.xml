@@ -32,7 +32,10 @@
     <logger name="com" level="INFO"/>
 
     <root level="DEBUG">
-        <appender-ref ref="CONSOLE"/>
         <appender-ref ref="LOG_FILE"/>
     </root>
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
 </configuration>

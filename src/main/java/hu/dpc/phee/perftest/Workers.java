@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.SQLOutput;
 import java.util.Map;
 
 @Component
@@ -28,7 +27,7 @@ public class Workers {
     public void step1Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
-        Map varMap =  job.getVariablesAsMap();
+        Map<String, Object> varMap =  job.getVariablesAsMap();
         logger.trace("Process instance [" + processInstanceKey + "] -> step1 invoked:  " + workerStart);
         try {
             Thread.sleep(workerSleepTime);
@@ -45,7 +44,7 @@ public class Workers {
     public void step2Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
-        Map varMap =  job.getVariablesAsMap();
+        Map<String, Object> varMap =  job.getVariablesAsMap();
         int jobNetExTime = (int) varMap.get("netExTime");
         logger.trace("Process instance [" + processInstanceKey + "] -> step2 invoked:  " + workerStart);
         try {
@@ -63,7 +62,7 @@ public class Workers {
     public void step3Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
-        Map varMap =  job.getVariablesAsMap();
+        Map<String, Object> varMap =  job.getVariablesAsMap();
         int jobNetExTime = (int) varMap.get("netExTime");
         logger.trace("Process instance [" + processInstanceKey + "] -> step3 invoked:  " + workerStart);
         try {
@@ -81,7 +80,7 @@ public class Workers {
     public void step4Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
-        Map varMap =  job.getVariablesAsMap();
+        Map<String, Object> varMap =  job.getVariablesAsMap();
         int jobNetExTime = (int) varMap.get("netExTime");
         logger.trace("Process instance [" + processInstanceKey + "] -> step4 invoked:  " + workerStart);
         try {
@@ -121,7 +120,7 @@ public class Workers {
         logger.debug("Process instance [{}][num: {}] -> finished flow in {}ms: {}ms execution, {}ms waiting", processInstanceKey, num, flowRuntime, jobNetExTime, (flowRuntime - jobNetExTime) );
         statistics.recordRuntime(flowRuntime);
         statistics.recordWaitingtime(waitingTime);
-        statistics.recordExecutiontime(Long.valueOf(jobNetExTime));
+        statistics.recordExecutiontime((long) jobNetExTime);
 
         //if all the processes of the test batch have completed
         if (statistics.completeProcessCount.incrementAndGet() == statistics.numberOfCreatedInstances) {
