@@ -30,10 +30,18 @@ public class Statistics {
      * stores the calculated runtime of each individual process instance
      */
     private List<Long> runtimes = new LinkedList<>();
+    private List<Long> waitingTimes = new LinkedList<>();
+    private List<Long> executionTimes = new LinkedList<>();
 
     public void recordRuntime(Long runtime) {
         runtimes.add(runtime);
     }
+
+    public void recordWaitingtime(Long runtime) {
+        waitingTimes.add(runtime);
+    }
+
+    public void recordExecutiontime(Long runtime) { executionTimes.add(runtime); }
 
     public void updateInitFailCount(int initFailCount) {
         this.initFailCount += initFailCount;
@@ -56,25 +64,38 @@ public class Statistics {
         startTime = 0;
         endTime = 0;
         runtimes = new LinkedList<>();
+        waitingTimes = new LinkedList<>();
+        executionTimes = new LinkedList<>();
     }
 
-    private void printResult(LongSummaryStatistics statistics) {
-        long count = statistics.getCount();
-        long sum = statistics.getSum();
-        double average = statistics.getAverage();
-        long min = statistics.getMin();
-        long max =  statistics.getMax();
+    private void printResult(LongSummaryStatistics[] statistics) {
 
-        logger.info("Process instances started with {} failed initializations", initFailCount);
-        logger.info("Test completed in {}ms -> " + statistics.toString(), convertTime(endTime - startTime));
+        long count = statistics[0].getCount();
+        long sum = statistics[0].getSum();
+        double average = statistics[0].getAverage();
+        long min = statistics[0].getMin();
+        long max =  statistics[0].getMax();
+
+        logger.info("Process instances started with {} failed initializationsl", initFailCount);
+        logger.info("Test completed in {}ms -> " + statistics[0].toString(), convertTime(endTime - startTime));
+        logger.info("Average waiting time: {}ms ->" + statistics[1].toString(),statistics[1].getAverage());
+        logger.info("Average execution time: {}ms ->" + statistics[2].toString(),statistics[2].getAverage());
     }
 
-    private LongSummaryStatistics calculateStatistics() {
+    private LongSummaryStatistics[] calculateStatistics() {
         Stream<Long> stream = runtimes.stream();
+        Stream<Long> waitStream = waitingTimes.stream();
+        Stream<Long> executionStream = executionTimes.stream();
 
         LongSummaryStatistics statistics = stream.collect(Collectors.summarizingLong(Long::longValue));
+        LongSummaryStatistics waitStatistics = waitStream.collect(Collectors.summarizingLong(Long::longValue));
+        LongSummaryStatistics executionStatistics = executionStream.collect(Collectors.summarizingLong(Long::longValue));
 
-        return statistics;
+        LongSummaryStatistics[] stats = new LongSummaryStatistics[3];
+        stats[0]=statistics;
+        stats[1]=waitStatistics;
+        stats[2]=executionStatistics;
+        return stats;
     }
 
     public String convertTime(long sum){
@@ -85,4 +106,5 @@ public class Statistics {
         String time = String.format("%02d:%02d:%02d.%d", hour, minute, second, millis);
         return time;
     }
+
 }

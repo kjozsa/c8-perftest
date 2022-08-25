@@ -50,7 +50,7 @@ public class Endpoints {
             }
 
             statistics.updateInitFailCount(failedCount);
-            ctx.result("Number of fails : " +String.valueOf(failedCount));
+            ctx.result("Number of fails : " + String.valueOf(failedCount));
         });
 
         app.get("/start/slow/{num}", ctx -> {
