@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.sql.SQLOutput;
+import java.util.Map;
+
 @Component
 public class Workers {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -81,7 +84,7 @@ public class Workers {
         logger.trace("Process instance [" + processInstanceKey + "] -> step4 complete: " + System.currentTimeMillis() + " in: " + (workerFinish-workerStart) + "ms");
     }
 
-    @ZeebeWorker(type = "step5", fetchVariables = "start")
+    @ZeebeWorker(type = "step5")
     public void step5Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
@@ -92,16 +95,19 @@ public class Workers {
 
         }
 
-        Long start = (Long) job.getVariablesAsMap().get("start");
-        Long num = (Long) job.getVariablesAsMap().get("num");
+        Map<String, Object> variableMap = job.getVariablesAsMap();
+        int num = (int) variableMap.get("num");
+        Long start = (Long) variableMap.get("start");
+
         client.newCompleteCommand(job.getKey()).send();
+
         long finish = System.currentTimeMillis();
         long flowRuntime = (finish-start);
         logger.trace("Process instance [" + processInstanceKey + "] -> step5 complete: " + System.currentTimeMillis() + " in: " + (finish-workerStart) + "ms");
         logger.debug("Process instance [{}][num: {}] -> finished flow in {}ms", processInstanceKey, num, flowRuntime);
         statistics.recordRuntime(flowRuntime);
 
-        //if all of the processes of the test batch have completed
+        //if all the processes of the test batch have completed
         if (statistics.completeProcessCount.incrementAndGet() == statistics.numberOfCreatedInstances) {
             statistics.endTest(finish);
         }

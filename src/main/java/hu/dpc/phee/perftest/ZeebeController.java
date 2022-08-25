@@ -29,7 +29,7 @@ public class ZeebeController {
                 long processInstanceKey = zeebeClient.newCreateInstanceCommand()
                         .bpmnProcessId("step15")
                         .latestVersion()
-                        .variables(Map.of("start", System.currentTimeMillis(), "num", (long) num))
+                        .variables(Map.of("start", System.currentTimeMillis(), "num", num))
                         .send()
                         .join()
                         .getProcessInstanceKey();
