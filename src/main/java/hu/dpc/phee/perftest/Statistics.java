@@ -66,7 +66,7 @@ public class Statistics {
         long max =  statistics.getMax();
 
         logger.info("Process instances started with {} failed initializations", initFailCount);
-        logger.info("Test completed in {}ms -> " + statistics.toString(), (endTime - startTime));
+        logger.info("Test completed in {}ms -> " + statistics.toString(), convertTime(endTime - startTime));
     }
 
     private LongSummaryStatistics calculateStatistics() {
@@ -75,5 +75,14 @@ public class Statistics {
         LongSummaryStatistics statistics = stream.collect(Collectors.summarizingLong(Long::longValue));
 
         return statistics;
+    }
+
+    public String convertTime(long sum){
+        long millis = sum % 1000;
+        long second = (sum / 1000) % 60;
+        long minute = (sum / (1000 * 60)) % 60;
+        long hour = (sum / (1000 * 60 * 60)) % 24;
+        String time = String.format("%02d:%02d:%02d.%d", hour, minute, second, millis);
+        return time;
     }
 }
