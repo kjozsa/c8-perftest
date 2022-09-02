@@ -4,9 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.LongSummaryStatistics;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,6 +20,8 @@ public class Statistics {
     private int initFailCount = 0;
     public int numberOfCreatedInstances = 0;
 
+    private boolean testRunning = false;
+
     /**
      * stores atomically the count of completed process instances, used to determine whether all instances have completed at any given time
      */
@@ -29,32 +30,38 @@ public class Statistics {
     /**
      * stores the calculated runtime of each individual process instance
      */
-    private List<Long> runtimes = new LinkedList<>();
-    private List<Long> waitingTimes = new LinkedList<>();
-    private List<Long> executionTimes = new LinkedList<>();
+    private ConcurrentLinkedQueue<Long> runtimes = new ConcurrentLinkedQueue<>();
+    private ConcurrentLinkedQueue<Long> waitingTimes = new ConcurrentLinkedQueue<>();
+    private ConcurrentLinkedQueue<Long> executionTimes = new ConcurrentLinkedQueue<>();
 
     public void recordRuntime(Long runtime) {
         runtimes.add(runtime);
     }
 
-    public void recordWaitingtime(Long runtime) {
+    public void recordWaitingTime(Long runtime) {
         waitingTimes.add(runtime);
     }
 
-    public void recordExecutiontime(Long runtime) { executionTimes.add(runtime); }
+    public void recordExecutionTime(Long runtime) {
+        executionTimes.add(runtime);
+    }
 
     public void updateInitFailCount(int initFailCount) {
         this.initFailCount += initFailCount;
     }
 
     public void beginTest(int instanceCount, long startTime) {
-        if (this.startTime == 0) {
+        if (!testRunning) {
+            testRunning = true;
             this.startTime = startTime;
         }
+
         numberOfCreatedInstances += instanceCount;
     }
 
     public void endTest(long endTime) {
+        testRunning = false;
+
         this.endTime = endTime;
         printResult(calculateStatistics());
 
@@ -63,9 +70,9 @@ public class Statistics {
         initFailCount = 0;
         startTime = 0;
         endTime = 0;
-        runtimes = new LinkedList<>();
-        waitingTimes = new LinkedList<>();
-        executionTimes = new LinkedList<>();
+        runtimes = new ConcurrentLinkedQueue<>();
+        waitingTimes = new ConcurrentLinkedQueue<>();
+        executionTimes = new ConcurrentLinkedQueue<>();
     }
 
     private void printResult(LongSummaryStatistics[] statistics) {

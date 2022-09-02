@@ -119,8 +119,8 @@ public class Workers {
         logger.trace("Process instance [" + processInstanceKey + "] -> step5 complete: " + System.currentTimeMillis() + " in: " + (finish-workerStart) + "ms");
         logger.debug("Process instance [{}][num: {}] -> finished flow in {}ms: {}ms execution, {}ms waiting", processInstanceKey, num, flowRuntime, jobNetExTime, (flowRuntime - jobNetExTime) );
         statistics.recordRuntime(flowRuntime);
-        statistics.recordWaitingtime(waitingTime);
-        statistics.recordExecutiontime((long) jobNetExTime);
+        statistics.recordWaitingTime(waitingTime);
+        statistics.recordExecutionTime((long) jobNetExTime);
 
         //if all the processes of the test batch have completed
         if (statistics.completeProcessCount.incrementAndGet() == statistics.numberOfCreatedInstances) {
