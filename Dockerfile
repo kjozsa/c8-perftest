@@ -4,7 +4,7 @@
 #COPY pom.xml pom.xml
 #RUN mvn clean package -DskipTests -DskipChecks
 
-FROM openjdk:18-jdk-slim
+FROM openjdk:17-bullseye
+EXPOSE 8080
 COPY ./target/*.jar app.jar
 CMD java -jar app.jar
-EXPOSE 8080

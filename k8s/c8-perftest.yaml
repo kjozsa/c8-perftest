@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: c8-perftest
+  namespace: camunda-perf
+  labels:
+    app: c8-perftest
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app: c8-perftest
+  template:
+    metadata:
+      labels:
+        app: c8-perftest
+    spec:
+      containers:
+      - name: c8-perftest
+        image: 218175819274.dkr.ecr.eu-central-1.amazonaws.com/c8-perftest:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: c8-perftest-gateway
+  namespace: camunda-perf
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30001
