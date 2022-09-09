@@ -2,6 +2,7 @@ package hu.dpc.phee.perftest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.LongSummaryStatistics;
@@ -73,6 +74,19 @@ public class Statistics {
         runtimes = new ConcurrentLinkedQueue<>();
         waitingTimes = new ConcurrentLinkedQueue<>();
         executionTimes = new ConcurrentLinkedQueue<>();
+    }
+
+    /**
+     * logs scheduled status updates while test program is running
+     */
+    @Scheduled(fixedRate = 60 * 1000, initialDelay = 10 * 1000)
+    private void printUpdate() {
+        if (testRunning) {
+            logger.info("Test is running -> [{}] out of [{}] process instances completed in {}", completeProcessCount.get(), numberOfCreatedInstances, convertTime(System.currentTimeMillis() - startTime));
+        }
+        else {
+            logger.info("Test not running ---");
+        }
     }
 
     private void printResult(LongSummaryStatistics[] statistics) {
