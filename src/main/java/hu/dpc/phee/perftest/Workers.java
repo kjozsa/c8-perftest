@@ -6,11 +6,14 @@ import io.camunda.zeebe.spring.client.annotation.ZeebeWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Component
+@PropertySource("classpath:application.properties")
 public class Workers {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -21,7 +24,8 @@ public class Workers {
     /**
      * determines the length of the "work" each worker does
      */
-    private static final  int workerSleepTime = 10;
+    @Value("${workerSleepTime:10}")
+    private int workerSleepTime;
 
     @ZeebeWorker(type = "step1")
     public void step1Worker(JobClient client, ActivatedJob job) {
