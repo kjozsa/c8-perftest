@@ -18,6 +18,12 @@ spec:
       containers:
       - name: c8-perftest
         image: 218175819274.dkr.ecr.eu-central-1.amazonaws.com/c8-perftest:latest
+        env:
+          - name: SPRING_APPLICATION_JSON
+            valueFrom:
+              configMapKeyRef:
+                name: spring-config
+                key: spring-config.json
 ---
 apiVersion: v1
 kind: Service
