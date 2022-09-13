@@ -22,7 +22,7 @@ spec:
           - name: SPRING_APPLICATION_JSON
             valueFrom:
               configMapKeyRef:
-                name: spring-config
+                name: c8-perftest-config
                 key: spring-config.json
 ---
 apiVersion: v1
