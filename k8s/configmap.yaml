@@ -9,6 +9,6 @@ data:
       "zeebe.client.broker.gateway-address": "camunda8-zeebe-gateway:26500",
       "zeebe.client.security.plaintext": "true",
       "zeebe.client.worker.max-jobs-active": "10",
-      "zeebe.client.worker.threads": "100",
-      "workerSleepTime": "10"
+      "zeebe.client.worker.threads": "10",
+      "workerSleepTime": "0"
      }'
