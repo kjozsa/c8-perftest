@@ -23,16 +23,11 @@ public class Statistics {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Qualifier("zeebeClientLifecycle")
-    @Autowired
-    private ZeebeClient zeebeClient;
-
-    private ZeebeClientConfiguration configuration = zeebeClient.getConfiguration();
-
-    private int threads = configuration.getNumJobWorkerExecutionThreads();
-    private int maxJobs = configuration.getDefaultJobWorkerMaxJobsActive();
-
-    @Value("${workerSleepTime:10}")
+    @Value("${zeebe.client.worker.threads}")
+    private int threads;
+    @Value("${zeebe.client.worker.max-jobs-active}")
+    private int maxJobs;
+    @Value("${workerSleepTime}")
     private int workerSleepTime;
 
     private long startTime = 0;
@@ -97,6 +92,7 @@ public class Statistics {
         initFailCount = 0;
         startTime = 0;
         endTime = 0;
+        initTimes = new ConcurrentLinkedQueue<>();
         runtimes = new ConcurrentLinkedQueue<>();
         waitingTimes = new ConcurrentLinkedQueue<>();
         executionTimes = new ConcurrentLinkedQueue<>();
