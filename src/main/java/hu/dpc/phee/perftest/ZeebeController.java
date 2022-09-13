@@ -18,14 +18,21 @@ public class ZeebeController {
     @Autowired
     private ZeebeClient zeebeClient;
 
+    @Autowired
+    private Statistics statistics;
 
-    public int startWorkflowInstance(int num) {
+
+    public void startWorkflowInstance(int num) {
+        long start;
+        long finish;
+        long initTime = 0;
         int attempt = 1;
-        int fail=0;
-        long wait_ms = 0;
+        int failedCount=0;
+        long retryWait;
         while (attempt > 0) {
             logger.debug("Attempting to start process [num: {}][attempt: {}]", num, attempt);
             try {
+                start = System.currentTimeMillis();
                 long processInstanceKey = zeebeClient.newCreateInstanceCommand()
                         .bpmnProcessId("step15")
                         .latestVersion()
@@ -33,21 +40,24 @@ public class ZeebeController {
                         .send()
                         .join()
                         .getProcessInstanceKey();
-                logger.debug("Started process instance [" + processInstanceKey + "][num: {}]:  " + System.currentTimeMillis(), num);
+                finish = System.currentTimeMillis();
+                initTime = finish - start;
+                logger.debug("Started process instance [{}][num: {}] in: {}", processInstanceKey, num, initTime);
                 attempt = 0;
             } catch (ClientStatusException clientStatusException) {
                 //exponential wait until retry
-                wait_ms = (long) (100 * Math.pow(2, attempt - 1));
-                logger.warn("Process instance [num: {}][attempt: {}] start FAILED -> retrying in [{}]ms", num, attempt, wait_ms);
-                fail=1;
+                retryWait = (long) (100 * Math.pow(2, attempt - 1));
+                logger.warn("Process instance [num: {}][attempt: {}] start FAILED -> retrying in [{}]ms", num, attempt, retryWait);
+                failedCount += 1;
                 try {
-                    Thread.sleep(wait_ms);
+                    Thread.sleep(retryWait);
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }
                 attempt++;
             }
         }
-        return fail;
+        statistics.recordInitTime(initTime);
+        statistics.updateInitFailCount(failedCount);
     }
 }

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: spring-config
+  name: c8-perftest-config
   namespace: camunda-perf
 data:
   spring-config.json:
