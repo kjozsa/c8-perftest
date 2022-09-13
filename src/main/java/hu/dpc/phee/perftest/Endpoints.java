@@ -3,7 +3,6 @@ package hu.dpc.phee.perftest;
 import io.javalin.Javalin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.PostConstruct;
 
 @Service
@@ -18,8 +17,6 @@ public class Endpoints {
     @Autowired
     Statistics statistics;
 
-    private int failedCount;
-
     @PostConstruct
     public void setup() {
         Javalin app = Javalin.create(config -> config.showJavalinBanner = false).start(8080);
@@ -30,7 +27,7 @@ public class Endpoints {
 
             zeebeController.startWorkflowInstance(0);
 
-            ctx.result("Number of fails : " +String.valueOf(failedCount));
+            ctx.result("process flows started");
         });
 
         app.get("/start/{num}", ctx -> {
@@ -43,7 +40,7 @@ public class Endpoints {
                 zeebeController.startWorkflowInstance(i);
             }
 
-            ctx.result("Number of fails : " + String.valueOf(failedCount));
+            ctx.result("process flows started");
         });
 
         app.get("/start/slow/{num}", ctx -> {
@@ -62,7 +59,7 @@ public class Endpoints {
                 }
             }
 
-            ctx.result("Number of fails : " +String.valueOf(failedCount));
+            ctx.result("process flows started");
         });
     }
 }
