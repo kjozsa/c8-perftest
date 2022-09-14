@@ -12,6 +12,6 @@ kubectl apply -f configmap.yaml
 kubectl rollout restart deployment c8-perftest -n camunda-perf
 
 #waits for the deployment to restart
-sleep 20s
+sleep 40s
 
-kubectl port-forward svc/c8-perftest-gateway 8080:8080 -n camunda-perf
+kubectl port-forward deployment/c8-perftest 8080:8080 -n camunda-perf

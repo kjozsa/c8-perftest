@@ -40,4 +40,4 @@ spec:
     protocol: TCP
     targetPort: 8080
   selector:
-    app.kubernetes.io/name: c8-perftest-gateway
+    app.kubernetes.io/name: c8-perftest
