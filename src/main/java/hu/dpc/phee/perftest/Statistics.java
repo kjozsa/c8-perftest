@@ -1,11 +1,7 @@
 package hu.dpc.phee.perftest;
 
-import io.camunda.zeebe.client.ZeebeClient;
-import io.camunda.zeebe.client.ZeebeClientConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,6 +12,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatistics;
 
 @Component
 @PropertySource("classpath:application.properties")
@@ -45,24 +44,25 @@ public class Statistics {
     /**
      * stores the calculated runtime of each individual process instance
      */
-    private ConcurrentLinkedQueue<Long> initTimes = new ConcurrentLinkedQueue<>();
-    private ConcurrentLinkedQueue<Long> runtimes = new ConcurrentLinkedQueue<>();
-    private ConcurrentLinkedQueue<Long> waitingTimes = new ConcurrentLinkedQueue<>();
-    private ConcurrentLinkedQueue<Long> executionTimes = new ConcurrentLinkedQueue<>();
+    private DescriptiveStatistics initStats = new SynchronizedDescriptiveStatistics();
+    private DescriptiveStatistics runStats = new SynchronizedDescriptiveStatistics();
+    private DescriptiveStatistics waitingStats = new SynchronizedDescriptiveStatistics();
+    private DescriptiveStatistics executionStats = new SynchronizedDescriptiveStatistics();
 
-    public void recordInitTime(Long initTime) {
-        initTimes.add(initTime);
-    }
-    public void recordRuntime(Long runtime) {
-        runtimes.add(runtime);
+    public void recordInitTime(long initTime) {
+        initStats.addValue(initTime);
     }
 
-    public void recordWaitingTime(Long waitingTime) {
-        waitingTimes.add(waitingTime);
+    public void recordRuntime(long runtime) {
+        runStats.addValue(runtime);
     }
 
-    public void recordExecutionTime(Long executionTime) {
-        executionTimes.add(executionTime);
+    public void recordWaitingTime(long waitingTime) {
+        waitingStats.addValue(waitingTime);
+    }
+
+    public void recordExecutionTime(long executionTime) {
+        executionStats.addValue(executionTime);
     }
 
     public void updateInitFailCount(int initFailCount) {
@@ -85,17 +85,19 @@ public class Statistics {
         testRunning = false;
 
         this.endTime = endTime;
-        printResult(calculateStatistics());
+
+        printStatistics();
 
         completeProcessCount.set(0);
         numberOfCreatedInstances = 0;
         initFailCount = 0;
         startTime = 0;
         endTime = 0;
-        initTimes = new ConcurrentLinkedQueue<>();
-        runtimes = new ConcurrentLinkedQueue<>();
-        waitingTimes = new ConcurrentLinkedQueue<>();
-        executionTimes = new ConcurrentLinkedQueue<>();
+
+        initStats.clear();
+        runStats.clear();
+        waitingStats.clear();
+        executionStats.clear();
     }
 
     /**
@@ -107,42 +109,24 @@ public class Statistics {
             logger.info("Test is running -> [{}] out of [{}] process instances completed in {}", completeProcessCount.get(), numberOfCreatedInstances, convertTime(System.currentTimeMillis() - startTime));
         }
         else {
-            logger.info("Test not running ---");
+            logger.info("Test not running [X]");
         }
     }
 
-    private void printResult(LongSummaryStatistics[] statistics) {
+    private void printStatistics() {
+        logger.info("Test completed -> [{}] instances in [{}] with [{}] retried initialisations", completeProcessCount.get(), convertTime(endTime - startTime), initFailCount);
 
-        long count = statistics[0].getCount();
-        long sum = statistics[0].getSum();
-        double average = statistics[0].getAverage();
-        long min = statistics[0].getMin();
-        long max =  statistics[0].getMax();
+        logger.info("PI initiation statistics  \t-> [n={}][average: {}ms, standard-deviation: {}ms, variance: {}ms]", initStats.getN(), initStats.getMean(), initStats.getStandardDeviation(), initStats.getVariance());
+        logger.info("PI initiation percentiles \t-> [min: {}][25th: {}][50th: {}][75th: {}][max: {}]", initStats.getMin(), initStats.getPercentile(25), initStats.getPercentile(50), initStats.getPercentile(75), initStats.getMax());
 
-        logger.info("Process instances started with {} failed initializations", initFailCount);
-        logger.info("Test completed in {}ms \t-> " + statistics[0].toString(), convertTime(endTime - startTime));
-        logger.info("Average init time: {}ms \t->" + statistics[1].toString(), statistics[1].getAverage());
-        logger.info("Average waiting time: {}ms \t-> " + statistics[2].toString(),statistics[2].getAverage());
-        logger.info("Average execution time: {}ms \t-> " + statistics[3].toString(),statistics[3].getAverage());
-    }
+        logger.info("PI runtime statistics  \t-> [n={}][average: {}ms, standard-deviation: {}ms, variance: {}ms]", runStats.getN(), runStats.getMean(), runStats.getStandardDeviation(), runStats.getVariance());
+        logger.info("PI runtime percentiles \t-> [min: {}][25th: {}][50th: {}][75th: {}][max: {}]", runStats.getMin(), runStats.getPercentile(25), runStats.getPercentile(50), runStats.getPercentile(75), runStats.getMax());
 
-    private LongSummaryStatistics[] calculateStatistics() {
-        Stream<Long> initStream = initTimes.stream();
-        Stream<Long> runStream = runtimes.stream();
-        Stream<Long> waitStream = waitingTimes.stream();
-        Stream<Long> executionStream = executionTimes.stream();
+        logger.info("PI idle time statistics  \t-> [n={}][average: {}ms, standard-deviation: {}ms, variance: {}ms]", waitingStats.getN(), waitingStats.getMean(), waitingStats.getStandardDeviation(), waitingStats.getVariance());
+        logger.info("PI idle time percentiles \t-> [min: {}][25th: {}][50th: {}][75th: {}][max: {}]", waitingStats.getMin(), waitingStats.getPercentile(25), waitingStats.getPercentile(50), waitingStats.getPercentile(75), waitingStats.getMax());
 
-        LongSummaryStatistics initStatistics = initStream.collect(Collectors.summarizingLong(Long::longValue));
-        LongSummaryStatistics runStatistics = runStream.collect(Collectors.summarizingLong(Long::longValue));
-        LongSummaryStatistics waitStatistics = waitStream.collect(Collectors.summarizingLong(Long::longValue));
-        LongSummaryStatistics executionStatistics = executionStream.collect(Collectors.summarizingLong(Long::longValue));
-
-        LongSummaryStatistics[] stats = new LongSummaryStatistics[4];
-        stats[0]=runStatistics;
-        stats[1]=initStatistics;
-        stats[2]=waitStatistics;
-        stats[3]=executionStatistics;
-        return stats;
+        logger.info("PI execution time statistics  \t-> [n={}][average: {}ms, standard-deviation: {}ms, variance: {}ms]", executionStats.getN(), executionStats.getMean(), executionStats.getStandardDeviation(), executionStats.getVariance());
+        logger.info("PI execution time percentiles \t-> [min: {}][25th: {}][50th: {}][75th: {}][max: {}]", executionStats.getMin(), executionStats.getPercentile(25), executionStats.getPercentile(50), executionStats.getPercentile(75), executionStats.getMax());
     }
 
     public String convertTime(long sum){
