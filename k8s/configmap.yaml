@@ -10,5 +10,5 @@ data:
       "zeebe.client.security.plaintext": "true",
       "zeebe.client.worker.max-jobs-active": "20",
       "zeebe.client.worker.threads": "20",
-      "workerSleepTime": "0"
+      "workerSleepTime": "5"
      }'

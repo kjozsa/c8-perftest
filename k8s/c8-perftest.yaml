@@ -30,9 +30,14 @@ kind: Service
 metadata:
   name: c8-perftest-gateway
   namespace: camunda-perf
+  labels:
+    app: c8-perftest
 spec:
   type: NodePort
   ports:
-  - port: 8080
+  - name: http
+    port: 8080
+    protocol: TCP
     targetPort: 8080
-    nodePort: 30001
+  selector:
+    app.kubernetes.io/name: c8-perftest-gateway

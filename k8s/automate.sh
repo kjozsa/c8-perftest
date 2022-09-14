@@ -10,3 +10,8 @@ sed -i -E "13 s/[0-9]+/$3/g" configmap.yaml
 #updates configmap, restarts deployment to apply changes
 kubectl apply -f configmap.yaml
 kubectl rollout restart deployment c8-perftest -n camunda-perf
+
+#waits for the deployment to restart
+sleep 20s
+
+kubectl port-forward svc/c8-perftest-gateway 8080:8080 -n camunda-perf
