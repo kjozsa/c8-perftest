@@ -44,7 +44,9 @@ public class Endpoints {
 
             ctx.result("test complete");
         });
+
         app.get("/start/slow/{num}", ctx -> {
+            int num = Integer.parseInt(ctx.pathParam("num"));
 
             zeebeController.startInstances(num, 1000);
 
