@@ -14,12 +14,12 @@ kubectl rollout restart deployment c8-perftest -n camunda-perf
 #waits for the deployment to restart
 sleep 40s
 
-kubectl port-forward deployment/c8-perftest 8080:8080 -n camunda-perf
+kubectl port-forward deployment/c8-perftest 8080:8080 -n camunda-perf &
 
 sleep 5s
 
 url="localhost:8080/start/"
-limit= $(($4 + $5 * $6))
+limit=$(($4 + $5 * $6))
 
 for ((i=$4;i<$limit;i+=$6)) 
 do
