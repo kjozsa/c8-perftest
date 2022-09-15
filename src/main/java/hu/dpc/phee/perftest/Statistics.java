@@ -66,8 +66,8 @@ public class Statistics {
     }
 
     public void beginTest(int instanceCount, long startTime) {
-        logger.info("Initialising {} instances", instanceCount);
-        logger.info("thread-count={}, max-active-jobs={}, worker-sleep={}", threads, maxJobs, workerSleepTime);
+        logger.info("Initialising [{}] instances", instanceCount);
+        logger.info("Configuration: thread-count={}, max-active-jobs={}, worker-sleep={}", threads, maxJobs, workerSleepTime);
 
         if (!testRunning) {
             testRunning = true;
@@ -112,17 +112,17 @@ public class Statistics {
     private void printStatistics() {
         logger.info("Test completed -> [{}] instances in [{}] with [{}] retried initialisations", completeProcessCount.get(), convertTime(endTime - startTime), initFailCount);
 
-        logger.info("PI initiation statistics  \t-> [n={}][average: {}ms, standard-deviation: {}ms, variance: {}ms]", initStats.getN(), initStats.getMean(), initStats.getStandardDeviation(), initStats.getVariance());
-        logger.info("PI initiation percentiles \t-> [min: {}][25th: {}][50th: {}][75th: {}][max: {}]", initStats.getMin(), initStats.getPercentile(25), initStats.getPercentile(50), initStats.getPercentile(75), initStats.getMax());
+        logger.info("PI initiation statistics  -> [n={}][average: {}ms, standard-deviation: {}ms, variance: {}ms]", initStats.getN(), initStats.getMean(), initStats.getStandardDeviation(), initStats.getVariance());
+        logger.info("PI initiation percentiles -> [min: {}][25th: {}][50th: {}][75th: {}][max: {}]", initStats.getMin(), initStats.getPercentile(25), initStats.getPercentile(50), initStats.getPercentile(75), initStats.getMax());
 
-        logger.info("PI runtime statistics  \t-> [n={}][average: {}ms, standard-deviation: {}ms, variance: {}ms]", runStats.getN(), runStats.getMean(), runStats.getStandardDeviation(), runStats.getVariance());
-        logger.info("PI runtime percentiles \t-> [min: {}][25th: {}][50th: {}][75th: {}][max: {}]", runStats.getMin(), runStats.getPercentile(25), runStats.getPercentile(50), runStats.getPercentile(75), runStats.getMax());
+        logger.info("PI runtime statistics     -> [n={}][average: {}ms, standard-deviation: {}ms, variance: {}ms]", runStats.getN(), runStats.getMean(), runStats.getStandardDeviation(), runStats.getVariance());
+        logger.info("PI runtime percentiles    -> [min: {}][25th: {}][50th: {}][75th: {}][max: {}]", runStats.getMin(), runStats.getPercentile(25), runStats.getPercentile(50), runStats.getPercentile(75), runStats.getMax());
 
-        logger.info("PI idle time statistics  \t-> [n={}][average: {}ms, standard-deviation: {}ms, variance: {}ms]", waitingStats.getN(), waitingStats.getMean(), waitingStats.getStandardDeviation(), waitingStats.getVariance());
-        logger.info("PI idle time percentiles \t-> [min: {}][25th: {}][50th: {}][75th: {}][max: {}]", waitingStats.getMin(), waitingStats.getPercentile(25), waitingStats.getPercentile(50), waitingStats.getPercentile(75), waitingStats.getMax());
+        logger.info("PI idle time statistics   -> [n={}][average: {}ms, standard-deviation: {}ms, variance: {}ms]", waitingStats.getN(), waitingStats.getMean(), waitingStats.getStandardDeviation(), waitingStats.getVariance());
+        logger.info("PI idle time percentiles  -> [min: {}][25th: {}][50th: {}][75th: {}][max: {}]", waitingStats.getMin(), waitingStats.getPercentile(25), waitingStats.getPercentile(50), waitingStats.getPercentile(75), waitingStats.getMax());
 
-        logger.info("PI execution time statistics  \t-> [n={}][average: {}ms, standard-deviation: {}ms, variance: {}ms]", executionStats.getN(), executionStats.getMean(), executionStats.getStandardDeviation(), executionStats.getVariance());
-        logger.info("PI execution time percentiles \t-> [min: {}][25th: {}][50th: {}][75th: {}][max: {}]", executionStats.getMin(), executionStats.getPercentile(25), executionStats.getPercentile(50), executionStats.getPercentile(75), executionStats.getMax());
+        logger.info("PI exec time statistics   -> [n={}][average: {}ms, standard-deviation: {}ms, variance: {}ms]", executionStats.getN(), executionStats.getMean(), executionStats.getStandardDeviation(), executionStats.getVariance());
+        logger.info("PI exec time percentiles  -> [min: {}][25th: {}][50th: {}][75th: {}][max: {}]", executionStats.getMin(), executionStats.getPercentile(25), executionStats.getPercentile(50), executionStats.getPercentile(75), executionStats.getMax());
     }
 
     public String convertTime(long sum){
