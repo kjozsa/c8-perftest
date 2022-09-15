@@ -39,7 +39,6 @@ public class Endpoints {
             for (int i = 0; i < num; i++) {
                 zeebeController.startWorkflowInstance(i);
             }
-
             ctx.result("process flows started");
         });
 

@@ -15,3 +15,16 @@ kubectl rollout restart deployment c8-perftest -n camunda-perf
 sleep 40s
 
 kubectl port-forward deployment/c8-perftest 8080:8080 -n camunda-perf
+
+sleep 5s
+
+url="localhost:8080/start/"
+limit= $(($4 + $5 * $6))
+
+for ((i=$4;i<$limit;i+=$6)) 
+do
+    updatedUrl=${url}$i
+    until $(curl ${updatedUrl}); do
+        sleep 10
+    done
+done
