@@ -23,43 +23,38 @@ public class Endpoints {
         app.get("/", ctx -> ctx.result("ready"));
 
         app.get("/start", ctx -> {
-            statistics.beginTest(1, System.currentTimeMillis());
 
-            zeebeController.startWorkflowInstance(0);
+            zeebeController.startInstances(1);
 
-            ctx.result("process flows started");
+            while (statistics.isTestRunning()) {
+                Thread.sleep(5000);
+            }
+
+            ctx.result("test complete");
         });
 
         app.get("/start/{num}", ctx -> {
             int num = Integer.parseInt(ctx.pathParam("num"));
 
-            statistics.beginTest(num, System.currentTimeMillis());
+            zeebeController.startInstances(num);
 
-            //TODO measure PI starts per sec
-            for (int i = 0; i < num; i++) {
-                zeebeController.startWorkflowInstance(i);
+            while (statistics.isTestRunning()) {
+                Thread.sleep(5000);
             }
 
-            ctx.result("process flows started");
+            ctx.result("test complete");
         });
 
         app.get("/start/slow/{num}", ctx -> {
             int num = Integer.parseInt(ctx.pathParam("num"));
 
-            statistics.beginTest(num, System.currentTimeMillis());
+            zeebeController.startInstances(num, 1000);
 
-            for (int i = 0; i < num; i++) {
-                zeebeController.startWorkflowInstance(i);
-
-                //wait one second between instance inits
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+            while (statistics.isTestRunning()) {
+                Thread.sleep(5000);
             }
 
-            ctx.result("process flows started");
+            ctx.result("test complete");
         });
     }
 }

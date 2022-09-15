@@ -32,6 +32,10 @@ public class Statistics {
 
     private boolean testRunning = false;
 
+    public boolean isTestRunning() {
+        return testRunning;
+    }
+
     /**
      * stores atomically the count of completed process instances, used to determine whether all instances have completed at any given time
      */
