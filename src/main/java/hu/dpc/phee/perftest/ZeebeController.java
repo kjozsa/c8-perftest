@@ -21,18 +21,64 @@ public class ZeebeController {
     @Autowired
     private Statistics statistics;
 
+    /**
+     * starts multiple workflow process instances in a manner described by the arguments
+     * @param instanceCount the number of workflow instances to start
+     */
+    public void startInstances(int instanceCount) {
 
+        //start test
+        statistics.beginTest(instanceCount, System.currentTimeMillis());
+
+        for (int i = 0; i < instanceCount; i++) {
+
+            //start a workflow instance (with debug number 'i')
+            startWorkflowInstance(i);
+
+        }
+    }
+
+    /**
+     * starts multiple workflow process instances in a manner described by the arguments
+     * @param instanceCount the number of workflow instances to start
+     * @param interInitDelay the amount of time (in ms) to wait between starts
+     */
+    public void startInstances(int instanceCount, long interInitDelay) {
+
+        //start test
+        statistics.beginTest(instanceCount, System.currentTimeMillis());
+
+        for (int i = 0; i < instanceCount; i++) {
+
+            //start a workflow instance (with debug number 'i')
+            startWorkflowInstance(i);
+
+            //wait interInitDelay ms between instance inits
+            try {
+                Thread.sleep(interInitDelay);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * starts a single workflow process instance
+     * @param num a number assigned to each PI for debugging purposes
+     */
     public void startWorkflowInstance(int num) {
-        long start;
-        long finish;
-        long initTime = 0;
-        int attempt = 1;
-        int failedCount=0;
-        long retryWait;
+        long start;         //init start
+        long finish;        //init finish
+        long initTime = 0;  //the duration of the initiation
+        int attempt = 1;    //the count of init attempts
+        int failedCount=0;  //the count of init fails
+        long retryWait;     //the delay between init retries, increases with each consecutive retry
+
         while (attempt > 0) {
             logger.debug("Attempting to start process [num: {}][attempt: {}]", num, attempt);
             try {
                 start = System.currentTimeMillis();
+
                 long processInstanceKey = zeebeClient.newCreateInstanceCommand()
                         .bpmnProcessId("step15")
                         .latestVersion()
@@ -40,23 +86,32 @@ public class ZeebeController {
                         .send()
                         .join()
                         .getProcessInstanceKey();
+
                 finish = System.currentTimeMillis();
                 initTime = finish - start;
+
                 logger.debug("Started process instance [{}][num: {}] in: {}", processInstanceKey, num, initTime);
                 attempt = 0;
             } catch (ClientStatusException clientStatusException) {
-                //exponential wait until retry
+                //calculate next retry interval
                 retryWait = (long) (100 * Math.pow(2, attempt - 1));
+
+                //log init fail
                 logger.warn("Process instance [num: {}][attempt: {}] start FAILED -> retrying in [{}]ms", num, attempt, retryWait);
-                failedCount += 1;
+
+                //exponential wait until retry
                 try {
                     Thread.sleep(retryWait);
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }
+
+                failedCount++;
                 attempt++;
             }
         }
+
+        //record init statistics
         statistics.recordInitTime(initTime);
         statistics.updateInitFailCount(failedCount);
     }
