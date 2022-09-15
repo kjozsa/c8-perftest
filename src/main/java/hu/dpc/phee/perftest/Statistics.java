@@ -115,6 +115,10 @@ public class Statistics {
 
     private void printStatistics() {
         logger.info("Test completed -> [{}] instances in [{}] with [{}] retried initialisations", completeProcessCount.get(), convertTime(endTime - startTime), initFailCount);
+        logger.info("PI runtime  [average: {}ms, standard-deviation: {}ms, 25th: {}, 75th: {}]", runStats.getMean(), runStats.getStandardDeviation(), runStats.getPercentile(25), runStats.getPercentile(75));
+        logger.info("PI exectime [average: {}ms, standard-deviation: {}ms, 25th: {}, 75th: {}]", runStats.getMean(), runStats.getStandardDeviation(), runStats.getPercentile(25), runStats.getPercentile(75));
+
+        logger.info("Detailed stats:   ------------");
 
         logger.info("PI initiation statistics  -> [n={}][average: {}ms, standard-deviation: {}ms, variance: {}ms]", initStats.getN(), initStats.getMean(), initStats.getStandardDeviation(), initStats.getVariance());
         logger.info("PI initiation percentiles -> [min: {}][25th: {}][50th: {}][75th: {}][max: {}]", initStats.getMin(), initStats.getPercentile(25), initStats.getPercentile(50), initStats.getPercentile(75), initStats.getMax());
