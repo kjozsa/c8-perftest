@@ -14,10 +14,13 @@ kubectl rollout restart deployment c8-perftest -n camunda-perf
 #waits for the deployment to restart
 sleep 50s
 
+#starts forwarding port
 kubectl port-forward deployment/c8-perftest 8080:8080 -n camunda-perf &
 
 sleep 5s
 
+
+#calculates limit and begins to start instances $4: base, $5: count, $6: difference
 #url="localhost:8080/start/"
 #limit=$(($4 + $5 * $6))
 
@@ -29,9 +32,11 @@ sleep 5s
 #    done
 #done
 
+
+# part for static testing: starts the fourth command line amount of instances 3 times with a 10 ms difference
 url="localhost:8080/start/"
 
-for ((i=0;i<5;i++)) 
+for ((i=0;i<3;i++)) 
 do
     updatedUrl=${url}$4
     until $(curl ${updatedUrl}); do
