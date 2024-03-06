@@ -3,6 +3,3 @@ target/
 hs_err_pid*
 .idea/
 
-#log files
-/k8s/*.log
-
