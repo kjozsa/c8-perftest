@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="false">
+<configuration scan="true">
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -27,6 +27,8 @@
     <logger name="io.javalin" level="INFO"/>
     <logger name="io.camunda.zeebe" level="INFO"/>
 
+    <logger name="hu" level="TRACE"/>
+    <logger name="sun" level="INFO"/>
     <logger name="org" level="INFO"/>
     <logger name="org.springframework.context.support" level="WARN"/>
     <logger name="com" level="INFO"/>

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Map;
 
 @Component
@@ -20,82 +21,84 @@ public class Workers {
     @Autowired
     private Statistics statistics;
 
-
-    /**
-     * determines the length of the "work" each worker does
-     */
-    @Value("${workerSleepTime:10}")
+    @Value("${workerSleepTime}")
     private int workerSleepTime;
+
+    @PostConstruct
+    public void setup() {
+        logger.info("configured to sleep at workers for {}", workerSleepTime);
+    }
+
 
     @ZeebeWorker(type = "step1")
     public void step1Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
-        Map<String, Object> varMap =  job.getVariablesAsMap();
+        Map<String, Object> varMap = job.getVariablesAsMap();
         logger.trace("Process instance [" + processInstanceKey + "] -> step1 invoked:  " + workerStart);
         try {
             Thread.sleep(workerSleepTime);
-        }catch (Exception e) {
+        } catch (Exception e) {
 
         }
         long workerFinish = System.currentTimeMillis();
-        varMap.put("netExTime",(workerFinish-workerStart));
+        varMap.put("netExTime", (workerFinish - workerStart));
         client.newCompleteCommand(job.getKey()).variables(varMap).send();
-        logger.trace("Process instance [" + processInstanceKey + "] -> step1 complete: " + System.currentTimeMillis() + " in: " + (workerFinish-workerStart) + "ms");
+        logger.trace("Process instance [" + processInstanceKey + "] -> step1 complete: " + System.currentTimeMillis() + " in: " + (workerFinish - workerStart) + "ms");
     }
 
     @ZeebeWorker(type = "step2")
     public void step2Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
-        Map<String, Object> varMap =  job.getVariablesAsMap();
+        Map<String, Object> varMap = job.getVariablesAsMap();
         int jobNetExTime = (int) varMap.get("netExTime");
         logger.trace("Process instance [" + processInstanceKey + "] -> step2 invoked:  " + workerStart);
         try {
             Thread.sleep(workerSleepTime);
-        }catch (Exception e) {
+        } catch (Exception e) {
 
         }
         long workerFinish = System.currentTimeMillis();
-        varMap.put("netExTime",(workerFinish-workerStart+jobNetExTime));
+        varMap.put("netExTime", (workerFinish - workerStart + jobNetExTime));
         client.newCompleteCommand(job.getKey()).variables(varMap).send();
-        logger.trace("Process instance [" + processInstanceKey + "] -> step2 complete: " + System.currentTimeMillis() + " in: " + (workerFinish-workerStart) + "ms");
+        logger.trace("Process instance [" + processInstanceKey + "] -> step2 complete: " + System.currentTimeMillis() + " in: " + (workerFinish - workerStart) + "ms");
     }
 
     @ZeebeWorker(type = "step3")
     public void step3Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
-        Map<String, Object> varMap =  job.getVariablesAsMap();
+        Map<String, Object> varMap = job.getVariablesAsMap();
         int jobNetExTime = (int) varMap.get("netExTime");
         logger.trace("Process instance [" + processInstanceKey + "] -> step3 invoked:  " + workerStart);
         try {
             Thread.sleep(workerSleepTime);
-        }catch (Exception e) {
+        } catch (Exception e) {
 
         }
         long workerFinish = System.currentTimeMillis();
-        varMap.put("netExTime",(workerFinish-workerStart+jobNetExTime));
+        varMap.put("netExTime", (workerFinish - workerStart + jobNetExTime));
         client.newCompleteCommand(job.getKey()).variables(varMap).send();
-        logger.trace("Process instance [" + processInstanceKey + "] -> step3 complete: " + System.currentTimeMillis() + " in: " + (workerFinish-workerStart) + "ms");
+        logger.trace("Process instance [" + processInstanceKey + "] -> step3 complete: " + System.currentTimeMillis() + " in: " + (workerFinish - workerStart) + "ms");
     }
 
     @ZeebeWorker(type = "step4")
     public void step4Worker(JobClient client, ActivatedJob job) {
         long processInstanceKey = job.getProcessInstanceKey();
         long workerStart = System.currentTimeMillis();
-        Map<String, Object> varMap =  job.getVariablesAsMap();
+        Map<String, Object> varMap = job.getVariablesAsMap();
         int jobNetExTime = (int) varMap.get("netExTime");
         logger.trace("Process instance [" + processInstanceKey + "] -> step4 invoked:  " + workerStart);
         try {
             Thread.sleep(workerSleepTime);
-        }catch (Exception e) {
+        } catch (Exception e) {
 
         }
         long workerFinish = System.currentTimeMillis();
-        varMap.put("netExTime",(workerFinish-workerStart+jobNetExTime));
+        varMap.put("netExTime", (workerFinish - workerStart + jobNetExTime));
         client.newCompleteCommand(job.getKey()).variables(varMap).send();
-        logger.trace("Process instance [" + processInstanceKey + "] -> step4 complete: " + System.currentTimeMillis() + " in: " + (workerFinish-workerStart) + "ms");
+        logger.trace("Process instance [" + processInstanceKey + "] -> step4 complete: " + System.currentTimeMillis() + " in: " + (workerFinish - workerStart) + "ms");
     }
 
     @ZeebeWorker(type = "step5")
@@ -105,7 +108,7 @@ public class Workers {
         logger.trace("Process instance [" + processInstanceKey + "] -> step5 invoked:  " + workerStart);
         try {
             Thread.sleep(workerSleepTime);
-        }catch (Exception e) {
+        } catch (Exception e) {
 
         }
 
@@ -117,11 +120,11 @@ public class Workers {
         client.newCompleteCommand(job.getKey()).send();
 
         long finish = System.currentTimeMillis();
-        long flowRuntime = (finish-start);
+        long flowRuntime = (finish - start);
         jobNetExTime += (finish - workerStart);
-        long waitingTime = flowRuntime-jobNetExTime;
-        logger.trace("Process instance [" + processInstanceKey + "] -> step5 complete: " + System.currentTimeMillis() + " in: " + (finish-workerStart) + "ms");
-        logger.debug("Process instance [{}][num: {}] -> finished flow in {}ms: {}ms execution, {}ms waiting", processInstanceKey, num, flowRuntime, jobNetExTime, (flowRuntime - jobNetExTime) );
+        long waitingTime = flowRuntime - jobNetExTime;
+        logger.trace("Process instance [" + processInstanceKey + "] -> step5 complete: " + System.currentTimeMillis() + " in: " + (finish - workerStart) + "ms");
+        logger.debug("Process instance [{}][num: {}] -> finished flow in {}ms: {}ms execution, {}ms waiting", processInstanceKey, num, flowRuntime, jobNetExTime, (flowRuntime - jobNetExTime));
         statistics.recordRuntime(flowRuntime);
         statistics.recordWaitingTime(waitingTime);
         statistics.recordExecutionTime((long) jobNetExTime);

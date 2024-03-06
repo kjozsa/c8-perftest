@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -21,39 +22,34 @@ public class ZeebeController {
     @Autowired
     private Statistics statistics;
 
+    @Value("${process-instance}")
+    private String processInstance;
+
     /**
      * starts multiple workflow process instances in a manner described by the arguments
+     *
      * @param instanceCount the number of workflow instances to start
      */
     public void startInstances(int instanceCount) {
-
-        //start test
         statistics.beginTest(instanceCount, System.currentTimeMillis());
 
         for (int i = 0; i < instanceCount; i++) {
-
-            //start a workflow instance (with debug number 'i')
             startWorkflowInstance(i);
-
         }
     }
 
     /**
      * starts multiple workflow process instances in a manner described by the arguments
-     * @param instanceCount the number of workflow instances to start
+     *
+     * @param instanceCount  the number of workflow instances to start
      * @param interInitDelay the amount of time (in ms) to wait between starts
      */
     public void startInstances(int instanceCount, long interInitDelay) {
-
-        //start test
         statistics.beginTest(instanceCount, System.currentTimeMillis());
 
         for (int i = 0; i < instanceCount; i++) {
-
-            //start a workflow instance (with debug number 'i')
             startWorkflowInstance(i);
 
-            //wait interInitDelay ms between instance inits
             try {
                 Thread.sleep(interInitDelay);
             } catch (InterruptedException e) {
@@ -64,6 +60,7 @@ public class ZeebeController {
 
     /**
      * starts a single workflow process instance
+     *
      * @param num a number assigned to each PI for debugging purposes
      */
     public void startWorkflowInstance(int num) {
@@ -71,7 +68,7 @@ public class ZeebeController {
         long finish;        //init finish
         long initTime = 0;  //the duration of the initiation
         int attempt = 1;    //the count of init attempts
-        int failedCount=0;  //the count of init fails
+        int failedCount = 0;  //the count of init fails
         long retryWait;     //the delay between init retries, increases with each consecutive retry
 
         while (attempt > 0) {
@@ -80,7 +77,7 @@ public class ZeebeController {
                 start = System.currentTimeMillis();
 
                 long processInstanceKey = zeebeClient.newCreateInstanceCommand()
-                        .bpmnProcessId("step15")
+                        .bpmnProcessId(processInstance)
                         .latestVersion()
                         .variables(Map.of("start", System.currentTimeMillis(), "num", num))
                         .send()
