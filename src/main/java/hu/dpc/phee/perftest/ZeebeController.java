@@ -31,11 +31,7 @@ public class ZeebeController {
      * @param instanceCount the number of workflow instances to start
      */
     public void startInstances(int instanceCount) {
-        statistics.beginTest(instanceCount, System.currentTimeMillis());
-
-        for (int i = 0; i < instanceCount; i++) {
-            startWorkflowInstance(i);
-        }
+        this.startInstances(instanceCount, 0);
     }
 
     /**
@@ -45,15 +41,18 @@ public class ZeebeController {
      * @param interInitDelay the amount of time (in ms) to wait between starts
      */
     public void startInstances(int instanceCount, long interInitDelay) {
-        statistics.beginTest(instanceCount, System.currentTimeMillis());
+        logger.info("Starting {} instances of {} flow", instanceCount, processInstance);
 
+        statistics.beginTest(instanceCount, System.currentTimeMillis());
         for (int i = 0; i < instanceCount; i++) {
             startWorkflowInstance(i);
 
-            try {
-                Thread.sleep(interInitDelay);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            if (interInitDelay > 0) {
+                try {
+                    Thread.sleep(interInitDelay);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }

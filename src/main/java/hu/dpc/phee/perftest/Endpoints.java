@@ -23,7 +23,6 @@ public class Endpoints {
         app.get("/", ctx -> ctx.result("ready"));
 
         app.get("/start", ctx -> {
-
             zeebeController.startInstances(1);
 
             while (statistics.isTestRunning()) {
@@ -35,7 +34,6 @@ public class Endpoints {
 
         app.get("/start/{num}", ctx -> {
             int num = Integer.parseInt(ctx.pathParam("num"));
-
             zeebeController.startInstances(num);
 
             while (statistics.isTestRunning()) {
@@ -47,7 +45,6 @@ public class Endpoints {
 
         app.get("/start/slow/{num}", ctx -> {
             int num = Integer.parseInt(ctx.pathParam("num"));
-
             zeebeController.startInstances(num, 1000);
 
             while (statistics.isTestRunning()) {
